@@ -69,7 +69,7 @@ Requirements
 GitHub Details
 ---
 
-- Fork the [GitHub Repository](https://github.com/cs582-17s/04-MapsAndViews). You now have a copy associated with your username.
+- Fork the [GitHub Repository](https://github.com/cs582-18s/04-MapsAndViews). You now have a copy associated with your username.
 - Make changes to index.html to fulfill the project requirements. 
 - Make sure your "master" branch matches your "gh-pages" branch. See the GitHub Guides referenced above if you need help.
 - Edit the README.md with a link to your gh-pages site: http://YourUsernameGoesHere.github.io/04-MapsAndViews/index.html
