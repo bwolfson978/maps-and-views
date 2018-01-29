@@ -1,10 +1,6 @@
 Assignment 4 - Visualizations and Multiple Views  
 ===
 
-In your recent lab you made a choropleth map of drought data.
-Map visualization yields considerable challenges, however.
-Multiple dimensions are difficult to visualize in a map: the size of regions impacts color perception, and map projections can distort real distances in the world.
-
 One of the most powerful techniques for mitigating the shortcomings of a given visualization is to link it with other views.
 Linking a map to a bar or scatterplot, for instance, may allow you to overcome the shortcomings of a map.
 In general, linking visualizations allows you to explore different parts of the data between views, and mitigates the shortcomings of a given view by pairing it with other views.
@@ -13,18 +9,10 @@ This technique, called coordinated multiple views, is the focus of this assignme
 Your task is to choose an interesting dataset and visualize it in *at least three* **linked** views.
 Each view should use a different visualization type, and interaction in one of the views should impact what's shown in the other views.
 
-_Due to popular request, you're not required to use a map. See the resources section for interesting datasets, but be sure to look for your own interesting data._
-
 You should choose data and visualizations that are sufficiently complex so a user can discover interesting patterns and trends on their own.
 
 For this assignment you should write everything from scratch.
-You may *reference* demo programs from books or the web, and if you do please provide a References section with links at the end of your Readme.
-
-Teams
----
-
-You can have choose to have (1) teammate.
-If you choose to do so, give a one sentence description of what each teammate contributed to the most.
+You may *reference and adapt* code from books or the web, and if you do please provide a References section with links at the end of your Readme.
 
 Resources
 ---
@@ -32,6 +20,8 @@ Resources
 Stanford recently released a set of [interesting datasets](http://cjlab.stanford.edu/2015/09/30/lab-launch-and-data-sets/).
 
 Chris Viau maintains a [huge list of d3 examples](http://christopheviau.com/d3list/gallery.html), some will have multiple views.
+
+See the course Tips page for more dataset possibilities.
 
 These three examples are intended to show you what multiple views visualizations might look like. 
 I wouldn't recommend using them as a your starting point, but you may find some inspiration:
@@ -69,27 +59,8 @@ Requirements
 GitHub Details
 ---
 
-- Fork the [GitHub Repository](https://github.com/cs582-18s/04-MapsAndViews). You now have a copy associated with your username.
+- Fork the GitHub Repository. You now have a copy associated with your username.
 - Make changes to index.html to fulfill the project requirements. 
 - Make sure your "master" branch matches your "gh-pages" branch. See the GitHub Guides referenced above if you need help.
-- Edit the README.md with a link to your gh-pages site: http://YourUsernameGoesHere.github.io/04-MapsAndViews/index.html
+- Edit the README.md with a link to your gh-pages site, for example http://YourUsernameGoesHere.github.io/04-MapsAndViews/index.html
 - To submit, make a [Pull Request](https://help.github.com/articles/using-pull-requests/) on the original repository.
-
-Grading
----
-
-Grades on a 120 point scale 80 points will be graded for functionality: the program does what the assignment requests. 
-20 points will be based on documentation in the README. 
-
-I will use Google Chrome to view submissions. Be sure to test your code there.
-
-Total -- 120
-
-(0 will be assigned if the code won't run.)
-
-80 -- Dataset loads and visualization works with no obvious bugs or design flaws  
-
-20 -- README
-
-10 -- Description of technical achievements    
-10 -- Description of design achievements  
