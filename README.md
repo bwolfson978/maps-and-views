@@ -64,3 +64,23 @@ GitHub Details
 - Make sure your "master" branch matches your "gh-pages" branch. See the GitHub Guides referenced above if you need help.
 - Edit the README.md with a link to your gh-pages site, for example http://YourUsernameGoesHere.github.io/04-MapsAndViews/index.html
 - To submit, make a [Pull Request](https://help.github.com/articles/using-pull-requests/) on the original repository.
+
+Technical Achivements
+---
+- reading in csv file from california - mapping names of counties to FIPS, storing data
+- getting a single state from topojson - filtering by state id
+
+Design Achievements
+---
+
+
+Sources
+---
+https://bl.ocks.org/mbostock/4060606
+https://www.weather.gov/hnx/cafips
+https://gist.githubusercontent.com/gregdevs/a73f8a16f129757c037e72ecdebdd8f2/raw/e36e06b88128a86534624a65a00375c5cea0a036/us.json
+https://www.cde.ca.gov/ds/sp/ai/
+https://bl.ocks.org/gregdevs/a73f8a16f129757c037e72ecdebdd8f2
+https://jrue.github.io/coding/2014/exercises/basicbubblepackchart/
+https://github.com/d3/d3-scale-chromatic/blob/master/README.md
+https://bl.ocks.org/danielatkin/57ea2f55b79ae686dfc7
