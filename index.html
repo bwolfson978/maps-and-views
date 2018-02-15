@@ -151,6 +151,14 @@
         .attr("transform",
             "translate(" + margin.left + "," + margin.top + ")");;
 
+    svg.append("text")
+        .attr("x", 150)
+        .attr("y", 10)
+        .attr("text-anchor", "left")
+        .style("font-size", "22px")
+        .style("text-decoration", "underline")
+        .text("SAT Scores by County in California")
+
     d3.queue()
         .defer(d3.json, "https://gist.githubusercontent.com/gregdevs/a73f8a16f129757c037e72ecdebdd8f2/raw/e36e06b88128a86534624a65a00375c5cea0a036/us.json")
         .defer(d3.csv, "sat16.csv", function(d){
@@ -231,7 +239,7 @@
             currentRegion = region;
             region.classList.add('hover');
         })
-        renderBarChart(data);
+        renderBarChart(data, "County");
         renderBubbleChart();
     }
 
@@ -250,7 +258,7 @@
         svg.selectAll("text").remove();
     }
 
-    function renderBarChart(data){
+    function renderBarChart(data, county){
         xLabels = ["Reading", "Math", "Writing"];
         var x = d3.scale.ordinal().domain(xLabels).rangeBands([0,200], .1);
         var y = d3.scale.linear().range([height, height/2]);
@@ -304,15 +312,21 @@
             .attr("fill", "white")
             .attr("x", function(d, i) {return (i * 60) + x.rangeBand()/2; })
             .attr("y", function(d) {return height - (d*(height-height/2))/800; })
-            .text(function(d){
-                return d;
-            });
+            .text(function(d){return d;});
+
+        svg.append("text")
+            .attr("x", margin.left + 20)
+            .attr("y", height/2)
+            .attr("text-anchor", "middle")
+            .style("font-size", "16px")
+            .style("text-decoration", "underline")
+            .text(county);
 
         dispatch.on("statechange.bar", function(d){
             var data = [+d.AvgScrRead, +d.AvgScrMath, +d.AvgScrWrit];
             console.log("bar chart heard statechange");
             removeBarChart();
-            renderBarChart(data);
+            renderBarChart(data, d.cname);
         })
     }
 
@@ -394,7 +408,8 @@
             trigger: 'manual',
             html: true,
             content: function() {
-                return "County: " + d.cname + "</br>Reading: " + d.AvgScrRead + "</br>Math: " + d.AvgScrMath + "</br>Writing: " + d.AvgScrWrit;
+                return "<b>County: </b>" + d.cname + "</br><b>Reading: </b>" + d.AvgScrRead + "</br><b>Math: </b>" + d.AvgScrMath +
+                                                "</br><b>Writing: </b>" + d.AvgScrWrit + "</br><b># Test Takers: </b>" + d.NumTstTakr;
             }
         });
         $(this).popover('show');
