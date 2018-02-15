@@ -69,7 +69,7 @@ Technical Achivements
 ---
 - reading in csv file from california - mapping names of counties to FIPS, storing data
 - getting a single state from topojson - filtering by state id
-
+- using querySelectors to get to the specific county regions in the topojson map proved very difficult
 Design Achievements
 ---
 
@@ -84,3 +84,4 @@ https://bl.ocks.org/gregdevs/a73f8a16f129757c037e72ecdebdd8f2
 https://jrue.github.io/coding/2014/exercises/basicbubblepackchart/
 https://github.com/d3/d3-scale-chromatic/blob/master/README.md
 https://bl.ocks.org/danielatkin/57ea2f55b79ae686dfc7
+https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector

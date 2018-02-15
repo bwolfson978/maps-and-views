@@ -26,7 +26,10 @@
             stroke: #fff;
             stroke-width: .5px;
         }
-        .county:hover{
+        .county:hover {
+            fill:orange;
+        }
+        .county.hover {
             fill:orange;
         }
 
@@ -119,7 +122,10 @@
         "Yuba" : 6115
     };
 
-    //var dispatch = d3.dispatch("statechange");
+    var dispatch = d3.dispatch("statechange");
+
+    //DOM elt corresponding to map region selected
+    var currentRegion;
 
     var margin = {top: 20, right: 20, bottom: 70, left: 40},
         width = 1100 - margin.left - margin.right,
@@ -153,9 +159,9 @@
                     "NumTstTakr" : d.NumTstTakr,
                     "sname" : d.sname,
                     "cname" : d.cname,
-                    "readScore" : d.AvgScrRead,
-                    "mathScore" : d.AvgScrMath,
-                    "writeScore" : d.AvgScrWrit
+                    "AvgScrRead" : d.AvgScrRead,
+                    "AvgScrMath" : d.AvgScrMath,
+                    "AvgScrWrit" : d.AvgScrWrit
                 });
             }
         })
@@ -211,22 +217,28 @@
                 // limit to CA counties, no data for Alpine (6003)
                 if(d.id.toString().startsWith("6") &&
                     d.id.toString().length == 4 && d.id != 6003){
-                    console.log(d.id);
-                    console.log(satMap);
                     return satMap.get(d.id)['cname'];
                 }
             });
 
+        currentRegion = document.querySelector("path.county[county-id='6075']");
+
+        dispatch.on("statechange.map", function(d){
+            console.log("map heard statechange");
+            var countyId = countyMap[d.cname];
+            currentRegion.classList.remove('hover');
+            var region = document.querySelector("path.county[county-id='"+countyId+"']");
+            currentRegion = region;
+            region.classList.add('hover');
+        })
         renderBarChart(data);
         renderBubbleChart();
     }
 
     function handleMouseOver(d, i){
-        removeBarChart();
+        console.log(this);
         var countyData = satMap.get(d.id);
-        var barData = [+countyData.readScore, +countyData.mathScore, +countyData.writeScore]
-        console.log(barData);
-        renderBarChart(barData);
+        dispatch.statechange(countyData);
     }
 
     function removeBarChart(){
@@ -294,7 +306,14 @@
             .attr("y", function(d) {return height - (d*(height-height/2))/800; })
             .text(function(d){
                 return d;
-            })
+            });
+
+        dispatch.on("statechange.bar", function(d){
+            var data = [+d.AvgScrRead, +d.AvgScrMath, +d.AvgScrWrit];
+            console.log("bar chart heard statechange");
+            removeBarChart();
+            renderBarChart(data);
+        })
     }
 
     function renderBubbleChart(){
@@ -331,10 +350,9 @@
                 .attr("cy", function(d){ return d.y; })
                 .attr("id", function(d){return d.cname;})
                 .on("mouseover", function(d) {
+                    console.log(this);
                     showPopover.call(this, d);
-                    var data = [+d.AvgScrRead, +d.AvgScrMath, +d.AvgScrWrit];
-                    removeBarChart();
-                    renderBarChart(data);
+                    dispatch.statechange(d);
                 })
                 .on("mouseout", function(d) {
                     removePopovers();
@@ -352,6 +370,13 @@
                     "font-family":"Helvetica Neue, Helvetica, Arial, san-serif",
                     "font-size": "10px"
                 });
+
+            dispatch.on("statechange.bubble", function(d){
+                console.log("bubble heard state change");
+                var circle = document.getElementById(d.cname);
+                removePopovers();
+                showPopover.call(circle, d);
+            })
         });
     }
 
