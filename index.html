@@ -39,6 +39,24 @@
             text-anchor: middle;
         }
 
+        body {
+            font: 10px sans-serif;
+        }
+
+        .bar rect {
+            shape-rendering: crispEdges;
+        }
+
+        .bar text {
+            fill: #999999;
+        }
+
+        .axis path, .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+
     </style>
 </head>
 
@@ -144,6 +162,8 @@
     var path = d3.geo.path()
         .projection(projection);
 
+    var histData = [];
+
     var svg = d3.select("body").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
@@ -162,6 +182,9 @@
     d3.queue()
         .defer(d3.json, "https://gist.githubusercontent.com/gregdevs/a73f8a16f129757c037e72ecdebdd8f2/raw/e36e06b88128a86534624a65a00375c5cea0a036/us.json")
         .defer(d3.csv, "sat16.csv", function(d){
+            if(d.AvgScrRead != null){
+                histData.push(+d.AvgScrRead);
+            }
             if(satMap.get(countyMap[d.cname]) == null){
                 satMap.set(countyMap[d.cname], {
                     "NumTstTakr" : d.NumTstTakr,
@@ -174,9 +197,6 @@
             }
         })
         .await(ready);
-
-    //start bar chart empty
-    var data = [0, 0, 0];
 
     function ready(error, us) {
         if (error) throw error;
@@ -239,8 +259,9 @@
             currentRegion = region;
             region.classList.add('hover');
         })
-        renderBarChart(data, "County");
+        renderBarChart([0, 0, 0], "County");
         renderBubbleChart();
+        renderHistogram();
     }
 
     function handleMouseOver(d, i){
@@ -256,6 +277,8 @@
         svg.selectAll("y axis").remove();
         svg.selectAll("bartext").remove();
         svg.selectAll("text").remove();
+        //svg.selectAll("barTitle").remove();
+        //svg.selectAll("g").selectAll("text").remove();
     }
 
     function renderBarChart(data, county){
@@ -315,9 +338,10 @@
             .text(function(d){return d;});
 
         svg.append("text")
-            .attr("x", margin.left + 20)
+            .attr("x", margin.left + 30)
             .attr("y", height/2)
             .attr("text-anchor", "middle")
+            .attr("class", "barTitle")
             .style("font-size", "16px")
             .style("text-decoration", "underline")
             .text(county);
@@ -392,6 +416,74 @@
                 showPopover.call(circle, d);
             })
         });
+    }
+
+    function renderHistogram(){
+        var color = "steelblue";
+        // A formatter for counts.
+        var formatCount = d3.format(",.0f");
+
+        var margin = {top: 20, right: 30, bottom: 30, left: 30},
+            width = 960 - margin.left - margin.right,
+            height = 500 - margin.top - margin.bottom;
+
+        var max = d3.max(histData);
+        var min = d3.min(histData);
+        var x = d3.scale.linear()
+            .domain([min, max])
+            .range([0, width]);
+
+        // Generate a histogram using twenty uniformly-spaced bins.
+        var data = d3.layout.histogram()
+            .bins(x.ticks(20))
+            (histData);
+
+        var yMax = d3.max(data, function(d){return d.length});
+        var yMin = d3.min(data, function(d){return d.length});
+        var colorScale = d3.scale.linear()
+            .domain([yMin, yMax])
+            .range([d3.rgb(color).brighter(), d3.rgb(color).darker()]);
+
+        var y = d3.scale.linear()
+            .domain([0, yMax])
+            .range([height, 0]);
+
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("bottom");
+
+        var svg = d3.select("body").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        var bar = svg.selectAll(".bar")
+            .data(data)
+            .enter().append("g")
+            .attr("class", "bar")
+            .attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
+
+        bar.append("rect")
+            .attr("x", 1)
+            .attr("width", (x(data[0].dx) - x(0)) - 1)
+            .attr("height", function(d) { return height - y(d.y); })
+            .attr("fill", function(d) {
+                return "steelblue";
+                //return colorScale(d.y)
+            });
+
+        bar.append("text")
+            .attr("dy", ".75em")
+            .attr("y", -12)
+            .attr("x", (x(data[0].dx) - x(0)) / 2)
+            .attr("text-anchor", "middle")
+            .text(function(d) { return formatCount(d.y); });
+
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
     }
 
     function removePopovers() {

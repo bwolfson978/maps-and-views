@@ -85,3 +85,5 @@ https://jrue.github.io/coding/2014/exercises/basicbubblepackchart/
 https://github.com/d3/d3-scale-chromatic/blob/master/README.md
 https://bl.ocks.org/danielatkin/57ea2f55b79ae686dfc7
 https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector
+https://bl.ocks.org/mbostock/5872848
+http://bl.ocks.org/nnattawat/8916402
