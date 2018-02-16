@@ -57,6 +57,12 @@
             shape-rendering: crispEdges;
         }
 
+        .brush .extent {
+            stroke: #fff;
+            fill-opacity: .125;
+            shape-rendering: crispEdges;
+        }
+
     </style>
 </head>
 
@@ -162,7 +168,12 @@
     var path = d3.geo.path()
         .projection(projection);
 
+    //histogram variables
     var histData = [];
+    var max;
+    var min;
+    var x;
+    var brush;
 
     var svg = d3.select("body").append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -200,6 +211,16 @@
 
     function ready(error, us) {
         if (error) throw error;
+
+        //populate the histogram variables after histData is populated
+        max = d3.max(histData);
+        min = d3.min(histData);
+        x = d3.scale.linear()
+            .domain([min, max])
+            .range([0, width]);
+        brush = d3.svg.brush()
+            .x(x)
+            .on("brush", brushed);
 
         console.log(us.objects);
         var states = topojson.feature(us, us.objects.states),
@@ -273,11 +294,11 @@
     function removeBarChart(){
         svg.selectAll("bar").remove();
         svg.selectAll("rect").remove();
-        svg.selectAll("x axis").remove();
-        svg.selectAll("y axis").remove();
-        svg.selectAll("bartext").remove();
-        svg.selectAll("text").remove();
-        //svg.selectAll("barTitle").remove();
+        svg.selectAll("text.xAxisText").remove();
+        svg.selectAll("text.yAxisText").remove();
+        svg.selectAll("text.bartext").remove();
+        svg.selectAll("g.tick text").remove();
+        svg.select("text.barTitle").remove();
         //svg.selectAll("g").selectAll("text").remove();
     }
 
@@ -303,6 +324,7 @@
             .call(xAxis)
             .selectAll("text")
             .style("text-anchor", "end")
+            .attr("class", "xAxisText")
             .attr("dx", "-.8em")
             .attr("dy", "-.55em")
             .attr("transform", "rotate(-90)" );
@@ -315,6 +337,7 @@
             .attr("x", -height/2)
             .attr("dy", ".71em")
             .style("text-anchor", "end")
+            .attr("class", "yAxisText")
             .text("Score");
 
         svg.selectAll("bar")
@@ -409,6 +432,16 @@
                     "font-size": "10px"
                 });
 
+            //chart title
+            svg.append("g")
+                .attr("transform", "translate(800,100)")
+                .append("text")
+                .attr("text-anchor", "middle")
+                .attr("class", "bubbleTitle")
+                .style("font-size", "16px")
+                .style("text-decoration", "underline")
+                .text("Counties by Number of Test Takers");
+
             dispatch.on("statechange.bubble", function(d){
                 console.log("bubble heard state change");
                 var circle = document.getElementById(d.cname);
@@ -423,15 +456,10 @@
         // A formatter for counts.
         var formatCount = d3.format(",.0f");
 
+
         var margin = {top: 20, right: 30, bottom: 30, left: 30},
             width = 960 - margin.left - margin.right,
             height = 500 - margin.top - margin.bottom;
-
-        var max = d3.max(histData);
-        var min = d3.min(histData);
-        var x = d3.scale.linear()
-            .domain([min, max])
-            .range([0, width]);
 
         // Generate a histogram using twenty uniformly-spaced bins.
         var data = d3.layout.histogram()
@@ -484,6 +512,13 @@
             .attr("class", "x axis")
             .attr("transform", "translate(0," + height + ")")
             .call(xAxis);
+
+        svg.append("g")
+            .attr("class", "x brush")
+            .call(brush)
+            .selectAll("rect")
+            .attr("y", -6)
+            .attr("height", height);
     }
 
     function removePopovers() {
@@ -505,6 +540,28 @@
             }
         });
         $(this).popover('show');
+    }
+
+    function drawBrush() {
+        // our year will this.innerText
+        console.log(this.innerText)
+
+        // define our brush extent to be begin and end of the year
+        brush.extent([new Date(this.innerText + '-01-01'), new Date(this.innerText + '-12-31')])
+
+        // now draw the brush to match our extent
+        // use transition to slow it down so we can see what is happening
+        // remove transition so just d3.select(".brush") to just draw
+        brush(d3.select(".brush").transition());
+
+        // now fire the brushstart, brushmove, and brushend events
+        // remove transition so just d3.select(".brush") to just draw
+        brush.event(d3.select(".brush").transition().delay(1000))
+    }
+
+    function brushed() {
+        console.log("in brushed function");
+        x.domain(brush.empty() ? x.domain() : brush.extent());
     }
 
 </script>
