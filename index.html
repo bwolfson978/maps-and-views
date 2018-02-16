@@ -150,6 +150,7 @@
 
     //DOM elt corresponding to map region selected
     var currentRegion;
+    var currentRegions;
 
     var margin = {top: 20, right: 20, bottom: 70, left: 40},
         width = 1100 - margin.left - margin.right,
@@ -217,10 +218,11 @@
         min = d3.min(histData);
         x = d3.scale.linear()
             .domain([min, max])
-            .range([0, width]);
+            .range([min, max]);
+        console.log(x);
         brush = d3.svg.brush()
             .x(x)
-            .on("brush", brushed);
+            .on("brushend", brushed);
 
         console.log(us.objects);
         var states = topojson.feature(us, us.objects.states),
@@ -271,18 +273,66 @@
             });
 
         currentRegion = document.querySelector("path.county[county-id='6075']");
+        currentRegions = [currentRegion];
 
         dispatch.on("statechange.map", function(d){
             console.log("map heard statechange");
-            var countyId = countyMap[d.cname];
-            currentRegion.classList.remove('hover');
-            var region = document.querySelector("path.county[county-id='"+countyId+"']");
-            currentRegion = region;
-            region.classList.add('hover');
-        })
+            console.log(d.length)
+            if(d.length == 2){
+                // brush state change -> multiple region light up
+                // get all counties
+                var regions = Array.from(document.querySelectorAll("path.county"));
+                console.log(regions);
+                console.log(+regions[0].attributes.getNamedItem("county-id").value);
+                // filter out non CA
+                var regionsInCA = regions.filter(inCA);
+                // filter out non in-range
+                var inRangeRegions = regionsInCA.filter(function(region){
+                    var id = region.getAttribute("county-id").valueOf().toString();
+                    if(id != 6003){
+                        var countyData = satMap.get(id);
+                        var score = satMap.get(region.getAttribute("county-id").valueOf().toString()).AvgScrRead;
+                        return (d[0] < score && score < d[1]);
+                    }
+                });
+                console.log(inRangeRegions);
+                // light up all inRangeRegions
+                currentRegions.forEach(function(region){
+                    var countyId = +region.getAttribute("county-id");
+                    var county = document.querySelector("path.county[county-id='"+countyId+"']");
+                    county.classList.remove('hover');
+                });
+                currentRegions = inRangeRegions;
+                inRangeRegions.forEach(function(region){
+                    var countyId = +region.getAttribute("county-id");
+                    var county = document.querySelector("path.county[county-id='"+countyId+"']");
+                    county.classList.add('hover');
+                })
+            }
+            else{
+                // single region to light up
+                var countyId = countyMap[d.cname];
+                currentRegion.classList.remove('hover');
+                var region = document.querySelector("path.county[county-id='"+countyId+"']");
+                currentRegion = region;
+                region.classList.add('hover');
+            }
+        });
+        /*
+        dispatch.on("brushcomplete.map", function(d){
+            console.log("map heard brush complete event");
+        });
+        */
         renderBarChart([0, 0, 0], "County");
         renderBubbleChart();
         renderHistogram();
+    }
+
+    function inCA(region){
+        var id = +region.getAttribute("county-id");
+        var result = Object.values(countyMap).includes(id);
+        console.log(result);
+        return result;
     }
 
     function handleMouseOver(d, i){
@@ -299,7 +349,6 @@
         svg.selectAll("text.bartext").remove();
         svg.selectAll("g.tick text").remove();
         svg.select("text.barTitle").remove();
-        //svg.selectAll("g").selectAll("text").remove();
     }
 
     function renderBarChart(data, county){
@@ -452,10 +501,8 @@
     }
 
     function renderHistogram(){
-        var color = "steelblue";
         // A formatter for counts.
         var formatCount = d3.format(",.0f");
-
 
         var margin = {top: 20, right: 30, bottom: 30, left: 30},
             width = 960 - margin.left - margin.right,
@@ -517,7 +564,7 @@
             .attr("class", "x brush")
             .call(brush)
             .selectAll("rect")
-            .attr("y", -6)
+            .attr("y", 0)
             .attr("height", height);
     }
 
@@ -560,8 +607,11 @@
     }
 
     function brushed() {
-        console.log("in brushed function");
-        x.domain(brush.empty() ? x.domain() : brush.extent());
+        //x.domain(brush.empty() ? x.domain() : brush.extent());
+        var extent = brush.extent(); //returns [xMin, xMax]
+        var rangeExtent = [x( extent[0] ), x( extent[1] ) ]; //convert
+        //dispatch event to light up counties within range
+        dispatch.statechange(rangeExtent);
     }
 
 </script>

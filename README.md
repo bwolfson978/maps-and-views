@@ -87,3 +87,4 @@ https://bl.ocks.org/danielatkin/57ea2f55b79ae686dfc7
 https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector
 https://bl.ocks.org/mbostock/5872848
 http://bl.ocks.org/nnattawat/8916402
+https://hackernoon.com/htmlcollection-nodelist-and-array-of-objects-da42737181f9
